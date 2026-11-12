@@ -38,7 +38,62 @@ let user=null,rows=[],editing=null;
 const $=id=>document.getElementById(id);
 const fields=["data","hora","fechamento","status","cliente","documento","contato","endereco","equipamento","marca","modelo","serie","patrimonio","relato","diagnostico","servico","pecas","tecnico","orcamento","orcamento_status","observacoes"];
 function msg(id,s){$(id).textContent=s;$(id).classList.remove("hidden")}
-function setupSignature(id){const c=$(id),ctx=c.getContext("2d");let drawing=false;function point(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}}function resize(){const old=c.toDataURL();const w=c.clientWidth||300,h=130;c.width=w*devicePixelRatio;c.height=h*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);ctx.lineWidth=2;ctx.lineCap="round";ctx.lineJoin="round";if(old&&old.length>1000){const im=new Image();im.onload=()=>ctx.drawImage(im,0,0,w,h);im.src=old}}resize();c.addEventListener("pointerdown",e=>{drawing=true;c.setPointerCapture(e.pointerId);const p=point(e);ctx.beginPath();ctx.moveTo(p.x,p.y)});c.addEventListener("pointermove",e=>{if(!drawing)return;const p=point(e);ctx.lineTo(p.x,p.y);ctx.stroke()});["pointerup","pointercancel","lostpointercapture"].forEach(ev=>c.addEventListener(ev,()=>drawing=false));return c}
+function setupSignature(id) {
+ const c = $(id);
+ const ctx = c.getContext("2d");
+ let drawing = false;
+
+ function resize() {
+   const w = c.clientWidth;
+   const h = 130;
+   if (!w) return;
+
+   const old = c.dataset.hasInk === "1" ? c.toDataURL() : null;
+   const ratio = window.devicePixelRatio || 1;
+
+   c.width = w * ratio;
+   c.height = h * ratio;
+
+   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+   ctx.lineWidth = 2;
+   ctx.lineCap = "round";
+   ctx.lineJoin = "round";
+   ctx.strokeStyle = "#172334";
+
+   if (old) {
+     const img = new Image();
+     img.onload = () => ctx.drawImage(img, 0, 0, w, h);
+     img.src = old;
+   }
+ }
+
+ const observer = new ResizeObserver(resize);
+ observer.observe(c);
+
+ c.addEventListener("pointerdown", e => {
+   e.preventDefault();
+   drawing = true;
+   c.dataset.hasInk = "1";
+   c.setPointerCapture(e.pointerId);
+   const r = c.getBoundingClientRect();
+   ctx.beginPath();
+   ctx.moveTo(e.clientX - r.left, e.clientY - r.top);
+ });
+
+ c.addEventListener("pointermove", e => {
+   if (!drawing) return;
+   e.preventDefault();
+   const r = c.getBoundingClientRect();
+   ctx.lineTo(e.clientX - r.left, e.clientY - r.top);
+   ctx.stroke();
+ });
+
+ ["pointerup", "pointercancel", "lostpointercapture"]
+ .forEach(ev => c.addEventListener(ev, () => drawing = false));
+
+ resize();
+ return c;
+}{const c=$(id),ctx=c.getContext("2d");let drawing=false;function point(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}}function resize(){const old=c.toDataURL();const w=c.clientWidth||300,h=130;c.width=w*devicePixelRatio;c.height=h*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);ctx.lineWidth=2;ctx.lineCap="round";ctx.lineJoin="round";if(old&&old.length>1000){const im=new Image();im.onload=()=>ctx.drawImage(im,0,0,w,h);im.src=old}}resize();c.addEventListener("pointerdown",e=>{drawing=true;c.setPointerCapture(e.pointerId);const p=point(e);ctx.beginPath();ctx.moveTo(p.x,p.y)});c.addEventListener("pointermove",e=>{if(!drawing)return;const p=point(e);ctx.lineTo(p.x,p.y);ctx.stroke()});["pointerup","pointercancel","lostpointercapture"].forEach(ev=>c.addEventListener(ev,()=>drawing=false));return c}
 const c1=setupSignature("sigC"),c2=setupSignature("sigT");
 function clearSig(id){const c=$(id);c.getContext("2d").clearRect(0,0,c.width,c.height)}
 function signature(c){return c.toDataURL("image/png")}
