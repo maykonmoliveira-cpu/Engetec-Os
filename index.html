@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b3b78"><title>ENGETEC | Ordem de Serviço</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f1f5f9;color:#172334;font:15px system-ui}header{background:#0b3b78;color:white;padding:18px;font-size:22px;font-weight:800}main{max-width:1000px;margin:18px auto;padding:0 12px}.card{background:white;border:1px solid #dce3ec;border-radius:12px;padding:16px;margin-bottom:14px}h2{font-size:17px;color:#0b3b78;border-bottom:1px solid #ddd;padding-bottom:8px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}.f{grid-column:span 12}.s3{grid-column:span 3}.s4{grid-column:span 4}.s6{grid-column:span 6}label{display:block;font-size:13px;font-weight:650;margin:5px 0}input,select,textarea{width:100%;padding:10px;border:1px solid #bbc7d5;border-radius:7px;font:inherit}textarea{min-height:70px}button{padding:10px 14px;margin:5px 4px 0 0;border:0;border-radius:7px;background:#0b3b78;color:white;font-weight:650}.alt{background:#e7eef7;color:#0b3b78}.danger{background:#a52c2c}.hidden{display:none!important}.notice{padding:10px;background:#edf5ff;border-radius:7px}.muted{color:#64748b;font-size:13px}.os{padding:12px;border:1px solid #ddd;border-radius:8px;margin-top:8px}canvas{display:block;width:100%;height:130px;border:1px dashed #999;touch-action:none;border-radius:7px;background:#fff}.item{padding:10px;border:1px solid #ddd;border-radius:8px;margin:8px 0}.item select{margin-top:6px}@media(max-width:650px){.s3,.s4,.s6{grid-column:span 12}}@media print{header,.no-print,#login,#listCard,#checklistCard{display:none!important}body{background:white}.card{border:0}}
+</style>
+</head>
+<body>
+<header>ENGETEC <small style="font-size:12px;font-weight:400">| ORDEM DE SERVIÇO TÉCNICA</small></header>
+<main>
+<section id="login" class="card"><h2>Acesso</h2><label>E-mail</label><input id="email" type="email"><label>Senha</label><input id="password" type="password"><button id="loginBtn">Entrar</button><button id="signupBtn" class="alt">Criar conta</button><p id="loginMsg" class="notice"></p></section>
+<div id="app" class="hidden">
+<section class="card no-print"><button id="newBtn" class="alt">Nova OS</button><button id="logoutBtn" class="alt">Sair</button> <span id="who" class="muted"></span><p id="msg" class="notice hidden"></p></section>
+<form id="form" class="card">
+<h2 id="heading">Nova Ordem de Serviço</h2>
+<div class="grid">
+<div class="f s3"><label>Número da OS</label><input id="num" readonly value="Gerado pelo banco"></div><div class="f s3"><label>Data de abertura</label><input id="data" type="date" required></div><div class="f s3"><label>Hora de início</label><input id="hora" type="time"></div><div class="f s3"><label>Hora de encerramento</label><input id="fechamento" type="time"></div><div class="f s3"><label>Status</label><select id="status"><option>Aberta</option><option>Em andamento</option><option>Concluída</option></select></div>
+</div>
+<h2>Cliente</h2><div class="grid"><div class="f s6"><label>Nome / Razão social *</label><input id="cliente" required></div><div class="f s3"><label>CPF / CNPJ</label><input id="documento"></div><div class="f s3"><label>Contato</label><input id="contato"></div><div class="f"><label>Endereço</label><input id="endereco"></div></div>
+<h2>Equipamento</h2><div class="grid"><div class="f s4"><label>Tipo *</label><select id="equipamento" required><option value="">Selecione</option><option>Autoclave</option><option>Termodesinfectora</option><option>Lavadora ultrassônica</option><option>Seladora</option><option>Osmose reversa</option><option>Incubadora</option><option>Monitor multiparamétrico</option><option>Outro</option></select></div><div class="f s4"><label>Marca</label><input id="marca"></div><div class="f s4"><label>Modelo</label><input id="modelo"></div><div class="f s6"><label>Nº de série</label><input id="serie"></div><div class="f s6"><label>Patrimônio</label><input id="patrimonio"></div></div>
+<h2>Atendimento técnico</h2><div class="grid"><div class="f"><label>Relato do cliente</label><textarea id="relato"></textarea></div><div class="f"><label>Diagnóstico</label><textarea id="diagnostico"></textarea></div><div class="f"><label>Serviço executado</label><textarea id="servico"></textarea></div><div class="f s6"><label>Peças / materiais</label><textarea id="pecas"></textarea></div><div class="f s6"><label>Técnico responsável *</label><input id="tecnico" required></div><div class="f s4"><label>Orçamento (R$)</label><input id="orcamento" type="number" min="0" step="0.01" placeholder="0,00"></div><div class="f s4"><label>Condição do orçamento</label><select id="orcamento_status"><option>Não informado</option><option>Aguardando aprovação</option><option>Aprovado</option><option>Reprovado</option></select></div><div class="f"><label>Observações finais</label><textarea id="observacoes"></textarea></div></div>
+<h2>Assinaturas</h2><div class="grid"><div class="f s6"><label>Assinatura do cliente</label><canvas id="sigC"></canvas><button type="button" class="alt" onclick="clearSig('sigC')">Limpar</button></div><div class="f s6"><label>Assinatura do técnico</label><canvas id="sigT"></canvas><button type="button" class="alt" onclick="clearSig('sigT')">Limpar</button></div></div>
+<div class="no-print"><button id="saveBtn">Salvar OS</button><button type="button" class="alt" id="printBtn">Imprimir / PDF</button></div>
+</form>
+<section id="checklistCard" class="card no-print"><h2>Biblioteca de Checklists ENGETEC</h2><p class="muted">Modelos iniciais para personalização. Confira sempre os procedimentos e limites no manual do fabricante.</p>
+<div class="grid"><div class="f s6"><label>Equipamento</label><select id="checkEquip"><option>Autoclave</option><option>Termodesinfectora</option><option>Lavadora ultrassônica</option><option>Seladora</option><option>Osmose reversa</option><option>Incubadora</option><option>Monitor multiparamétrico</option><option>Outro</option></select></div><div class="f s6"><label>Nome do checklist</label><input id="checkName" placeholder="Manutenção preventiva"></div><div class="f"><label>Itens (um por linha)</label><textarea id="checkItems" placeholder="Inspecionar estado geral&#10;Verificar conexões&#10;Testar funcionamento"></textarea></div></div><button type="button" id="saveTemplate">Salvar modelo</button><button type="button" class="alt" id="loadTemplate">Atualizar modelos</button><div id="templateList"></div><div id="runChecklist"></div>
+</section>
+<section id="listCard" class="card no-print"><h2>Ordens cadastradas</h2><input id="search" placeholder="Buscar número ou cliente"><div id="list"></div></section>
+</div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://sgyyfigxqeoobbtszqdv.supabase.co";
+const SUPABASE_KEY="sb_publishable_TlAC5LaFcS_3-WpAgUQeWQ_vOyautpO";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let user=null,rows=[],editing=null;
+const $=id=>document.getElementById(id);
+const fields=["data","hora","fechamento","status","cliente","documento","contato","endereco","equipamento","marca","modelo","serie","patrimonio","relato","diagnostico","servico","pecas","tecnico","orcamento","orcamento_status","observacoes"];
+function msg(id,s){$(id).textContent=s;$(id).classList.remove("hidden")}
+
+/* Assinaturas: função única, com escala correta para telas de celular. */
+function setupSignature(id) {
+ const c = $(id);
+ const ctx = c.getContext("2d");
+ let drawing = false;
+ function resize() {
+   const w = c.clientWidth, h = 130;
+   if (!w) return;
+   const old = c.dataset.hasInk === "1" ? c.toDataURL() : null;
+   const ratio = window.devicePixelRatio || 1;
+   c.width = Math.round(w * ratio);
+   c.height = Math.round(h * ratio);
+   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+   ctx.lineWidth = 2; ctx.lineCap = "round"; ctx.lineJoin = "round";
+   ctx.strokeStyle = "#172334";
+   if (old) {
+     const img = new Image();
+     img.onload = () => ctx.drawImage(img, 0, 0, w, h);
+     img.src = old;
+   }
+ }
+ if ("ResizeObserver" in window) new ResizeObserver(resize).observe(c);
+ else window.addEventListener("resize", resize);
+ c.addEventListener("pointerdown", e => {
+   e.preventDefault(); drawing = true; c.dataset.hasInk = "1";
+   if (c.setPointerCapture) c.setPointerCapture(e.pointerId);
+   const r = c.getBoundingClientRect();
+   ctx.beginPath(); ctx.moveTo(e.clientX-r.left, e.clientY-r.top);
+ });
+ c.addEventListener("pointermove", e => {
+   if (!drawing) return;
+   e.preventDefault();
+   const r = c.getBoundingClientRect();
+   ctx.lineTo(e.clientX-r.left, e.clientY-r.top); ctx.stroke();
+ });
+ ["pointerup","pointercancel","lostpointercapture"].forEach(ev =>
+   c.addEventListener(ev, () => drawing = false)
+ );
+ resize(); return c;
+}
+const c1=setupSignature("sigC"), c2=setupSignature("sigT");
+function clearSig(id){const c=$(id);c.getContext("2d").clearRect(0,0,c.width,c.height);c.dataset.hasInk="0"}
+function signature(c){return c.toDataURL("image/png")}
+function restoreSig(c,data){clearSig(c.id);if(!data||!data.startsWith("data:image"))return;const im=new Image();im.onload=()=>{const ctx=c.getContext("2d"),ratio=window.devicePixelRatio||1;ctx.drawImage(im,0,0,c.clientWidth,130)};im.src=data}
+function dateNow(){const d=new Date();$("data").value=new Date(d-d.getTimezoneOffset()*60000).toISOString().slice(0,10);$("hora").value=d.toTimeString().slice(0,5)}
+function reset(){editing=null;$("form").reset();$("num").value="Gerado pelo banco";$("heading").textContent="Nova Ordem de Serviço";clearSig("sigC");clearSig("sigT");dateNow()}
+function detail(){const o={};fields.forEach(k=>o[k]=$(k).value);o.assinatura_cliente=signature(c1);o.assinatura_tecnico=signature(c2);return o}
+function parse(s){try{return JSON.parse(s||"{}")}catch{return{}}}
+function esc(s){return String(s??"").replace(/[&<>\"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+async function enter(create){const email=$("email").value.trim(),password=$("password").value;if(!email||!password){msg("loginMsg","Informe e-mail e senha.");return}const r=create?await db.auth.signUp({email,password}):await db.auth.signInWithPassword({email,password});if(r.error){msg("loginMsg",r.error.message);return}if(create&&!r.data.session){msg("loginMsg","Confirme o e-mail recebido e depois entre.");return}await start()}
+async function start(){const r=await db.auth.getSession();user=r.data.session?.user;if(!user){$("login").classList.remove("hidden");$("app").classList.add("hidden");return}$("login").classList.add("hidden");$("app").classList.remove("hidden");$("who").textContent=user.email;reset();await load();await templates()}
+async function load(){const r=await db.from("ordens_servico").select("id,numero_os,tipo,descricao,tecnico_responsavel,status,data_abertura,data_conclusao,user_id").order("numero_os",{ascending:false});if(r.error){msg("msg","Erro ao carregar: "+r.error.message);return}rows=r.data||[];render()}
+function render(){const q=$("search").value.toLowerCase();const a=rows.filter(o=>(" "+o.numero_os+" "+o.tipo+" "+parse(o.descricao).cliente).toLowerCase().includes(q));$("list").innerHTML=a.map(o=>{const d=parse(o.descricao);return `<div class="os"><b>ENGETEC-OS-${String(o.numero_os).padStart(6,"0")}</b> · ${esc(d.cliente)}<div class="muted">${esc(o.tipo)} — ${esc(o.status)}</div><button class="alt" onclick="editOS('${o.id}')">Editar</button><button class="danger" onclick="deleteOS('${o.id}')">Excluir</button></div>`}).join("")||"<p class=muted>Nenhuma OS cadastrada.</p>"}
+window.editOS=id=>{const o=rows.find(v=>v.id===id);if(!o)return;const d=parse(o.descricao);editing=id;fields.forEach(k=>$(k).value=d[k]??"");restoreSig(c1,d.assinatura_cliente);restoreSig(c2,d.assinatura_tecnico);$("num").value="ENGETEC-OS-"+String(o.numero_os).padStart(6,"0");$("heading").textContent="Editar ordem";$("form").scrollIntoView({behavior:"smooth"})};
+window.deleteOS=async id=>{if(!confirm("Excluir esta OS?"))return;const r=await db.from("ordens_servico").delete().eq("id",id);if(r.error)msg("msg",r.error.message);else{msg("msg","OS excluída.");await load()}};
+$("form").onsubmit=async e=>{e.preventDefault();$("saveBtn").disabled=true;try{const d=detail(),p={tipo:d.equipamento,descricao:JSON.stringify(d),tecnico_responsavel:d.tecnico,status:d.status};if(d.data)p.data_abertura=new Date(d.data+"T"+(d.hora||"00:00")+":00").toISOString();p.data_conclusao=d.status==="Concluída"?new Date(d.data+"T"+(d.fechamento||d.hora||"23:59")+":00").toISOString():null;const r=editing?await db.from("ordens_servico").update(p).eq("id",editing).select("id,numero_os").single():await db.from("ordens_servico").insert(p).select("id,numero_os").single();if(r.error)throw r.error;msg("msg","OS salva: ENGETEC-OS-"+String(r.data.numero_os).padStart(6,"0"));reset();await load()}catch(e){msg("msg","Erro ao salvar: "+e.message)}finally{$("saveBtn").disabled=false}};
+const starter={
+"Autoclave":["Verificar guarnições e vedação","Inspecionar câmara e estrutura","Verificar gerador de vapor","Verificar bombas de água e vácuo","Inspecionar portas e travas","Verificar filtro de ar bacteriológico","Verificar filtro de vapor","Inspecionar sistema hidráulico","Inspecionar sistema pneumático","Verificar painel elétrico","Inspecionar cabeamentos e periféricos","Verificar válvulas de segurança","Verificar sistema de osmose","Executar testes de estanqueidade e Bowie-Dick conforme aplicável","Verificar horas e avisos de manutenção na IHM"],
+"Termodesinfectora":["Inspecionar câmara e portas","Verificar guarnições e travas","Inspecionar braços aspersores e bicos","Verificar filtros e sistema de drenagem","Inspecionar bombas e circulação","Verificar dosagem de produtos químicos","Verificar sensores de temperatura","Verificar sistema de aquecimento","Inspecionar conexões hidráulicas","Verificar alarmes e registros de ciclo"],
+"Lavadora ultrassônica":["Inspecionar cuba e estrutura","Verificar nível e qualidade da solução","Verificar aquecimento","Verificar temporizador e comandos","Verificar transdutores ultrassônicos","Inspecionar cabos e aterramento","Realizar teste funcional conforme fabricante"],
+"Seladora":["Inspecionar resistência de aquecimento","Verificar temperatura indicada","Verificar tempo e pressão de selagem","Inspecionar roletes e guias","Verificar integridade do cabo e plugue","Realizar teste de selagem"],
+"Osmose reversa":["Inspecionar pré-filtros","Verificar pressão de entrada e saída","Verificar membranas conforme plano do fabricante","Verificar condutividade da água","Inspecionar conexões e vazamentos","Verificar bomba e comandos"],
+"Incubadora":["Inspecionar câmara e vedação","Verificar temperatura indicada","Comparar temperatura com instrumento de referência","Verificar alarmes","Inspecionar ventilação","Verificar cabos e alimentação"],
+"Monitor multiparamétrico":["Inspecionar gabinete e tela","Verificar alimentação e bateria","Inspecionar cabos e sensores","Verificar alarmes sonoros e visuais","Verificar parâmetros com simulador apropriado","Inspecionar conectores"]
+};
+$("checkEquip").onchange=()=>{const a=starter[$("checkEquip").value]||["Inspecionar estado geral","Verificar alimentação e conexões","Testar funções conforme manual do fabricante"];$("checkItems").value=a.join("\n")};
+$("checkEquip").dispatchEvent(new Event("change"));
+$("saveTemplate").onclick=async()=>{const nome=$("checkName").value.trim(),itens=$("checkItems").value.split("\n").map(v=>v.trim()).filter(Boolean);if(!nome||!itens.length){alert("Informe o nome e os itens do modelo.");return}const r=await db.from("checklist_modelos").insert({nome,equipamento:$("checkEquip").value,descricao:"Modelo ENGETEC — validar com manual do fabricante",itens:itens.map(texto=>({texto})),versao:1,ativo:true});if(r.error)alert("Erro ao salvar modelo: "+r.error.message);else{alert("Modelo salvo.");$("checkName").value="";await templates()}};
+async function templates(){const r=await db.from("checklist_modelos").select("*").eq("ativo",true).order("equipamento");if(r.error){$("templateList").textContent="Não foi possível carregar modelos: "+r.error.message;return}const list=r.data||[];$("templateList").innerHTML=list.map(t=>`<div class="os"><b>${esc(t.equipamento)}</b> — ${esc(t.nome)} <button type="button" class="alt" onclick="useTemplate('${t.id}')">Executar</button></div>`).join("")||'<p class="muted">Nenhum modelo salvo. Preencha os campos acima e salve o primeiro.</p>'}
+window.useTemplate=async id=>{const r=await db.from("checklist_modelos").select("*").eq("id",id).single();if(r.error){alert(r.error.message);return}const t=r.data,items=Array.isArray(t.itens)?t.itens:[];$("runChecklist").innerHTML=`<h2>Executar: ${esc(t.nome)}</h2><div class="grid"><div class="f s6"><label>Cliente</label><input id="runCliente"></div><div class="f s6"><label>Técnico</label><input id="runTecnico"></div><div class="f s6"><label>Marca / modelo</label><input id="runMarca"></div><div class="f s6"><label>Número de série</label><input id="runSerie"></div><div class="f"><label>Observações gerais</label><textarea id="runObs"></textarea></div></div>${items.map((it,i)=>`<div class="item"><b>${esc(it.texto||it)}</b><select id="resp${i}"><option>OK</option><option>Não OK</option><option>Não aplicável</option></select><input id="obs${i}" placeholder="Medição / observação"></div>`).join("")}<button type="button" id="saveRun">Salvar execução</button>`;$("saveRun").onclick=async()=>{const respostas=items.map((it,i)=>({item:it.texto||it,status:$("resp"+i).value,observacao:$("obs"+i).value}));const x=await db.from("checklist_execucoes").insert({modelo_id:t.id,cliente:$("runCliente").value,equipamento:t.equipamento,marca:$("runMarca").value,numero_serie:$("runSerie").value,tecnico:$("runTecnico").value,data_execucao:new Date().toISOString(),respostas,observacoes:$("runObs").value});if(x.error)alert("Erro ao salvar execução: "+x.error.message);else alert("Checklist salvo no histórico.")}};
+$("loginBtn").onclick=()=>enter(false);$("signupBtn").onclick=()=>enter(true);$("logoutBtn").onclick=async()=>{await db.auth.signOut();await start()};$("newBtn").onclick=reset;$("printBtn").onclick=()=>window.print();$("search").oninput=render;start();
+</script></body></html>
