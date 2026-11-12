@@ -18,3 +18,82 @@ create policy "select own os" on public.ordens_servico for select to authenticat
 create policy "insert own os" on public.ordens_servico for insert to authenticated with check(auth.uid()=user_id);
 create policy "update own os" on public.ordens_servico for update to authenticated using(auth.uid()=user_id) with check(auth.uid()=user_id);
 create policy "delete own os" on public.ordens_servico for delete to authenticated using(auth.uid()=user_id);
+
+-- BIBLIOTECA DE CHECKLISTS ENGETEC
+
+create table if not exists public.checklist_modelos (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid()
+    references auth.users(id) on delete cascade,
+  nome text not null,
+  equipamento text not null,
+  descricao text,
+  itens jsonb not null default '[]'::jsonb,
+  versao integer not null default 1,
+  ativo boolean not null default true,
+  created_at timestamptz default now()
+);
+
+create table if not exists public.checklist_execucoes (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid()
+    references auth.users(id) on delete cascade,
+  modelo_id uuid references public.checklist_modelos(id),
+  os_id text,
+  cliente text,
+  equipamento text not null,
+  marca text,
+  modelo text,
+  numero_serie text,
+  tecnico text,
+  data_execucao date default current_date,
+  respostas jsonb not null default '[]'::jsonb,
+  observacoes text,
+  created_at timestamptz default now()
+);
+
+alter table public.checklist_modelos
+enable row level security;
+
+alter table public.checklist_execucoes
+enable row level security;
+
+create policy "modelos_select"
+on public.checklist_modelos
+for select to authenticated
+using (auth.uid() = user_id);
+
+create policy "modelos_insert"
+on public.checklist_modelos
+for insert to authenticated
+with check (auth.uid() = user_id);
+
+create policy "modelos_update"
+on public.checklist_modelos
+for update to authenticated
+using (auth.uid() = user_id);
+
+create policy "modelos_delete"
+on public.checklist_modelos
+for delete to authenticated
+using (auth.uid() = user_id);
+
+create policy "execucoes_select"
+on public.checklist_execucoes
+for select to authenticated
+using (auth.uid() = user_id);
+
+create policy "execucoes_insert"
+on public.checklist_execucoes
+for insert to authenticated
+with check (auth.uid() = user_id);
+
+create policy "execucoes_update"
+on public.checklist_execucoes
+for update to authenticated
+using (auth.uid() = user_id);
+
+create policy "execucoes_delete"
+on public.checklist_execucoes
+for delete to authenticated
+using (auth.uid() = user_id);
