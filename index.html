@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b3b78"><link rel="manifest" href="./manifest.json">
+<title>ENGETEC | Ordem de Serviço</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f1f5f9;color:#172334;font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:#0b3b78;color:#fff;padding:18px max(16px,calc((100% - 1050px)/2))}.brand{font-size:23px;font-weight:800;letter-spacing:2px}
+main{max-width:1050px;margin:20px auto;padding:0 14px}.card{background:#fff;border:1px solid #dce3ec;border-radius:13px;padding:18px;margin-bottom:15px;box-shadow:0 3px 12px #14243a0a}
+h2{font-size:17px;color:#0b3b78;border-bottom:1px solid #e4ebf3;padding-bottom:8px;margin:0 0 13px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}.f{grid-column:span 12}.s3{grid-column:span 3}.s4{grid-column:span 4}.s6{grid-column:span 6}
+label{display:block;font-size:13px;font-weight:650;margin:2px 0 5px}input,select,textarea{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;background:#fff}textarea{min-height:75px}
+button{padding:11px 15px;border:0;border-radius:8px;background:#0b3b78;color:#fff;font-weight:650;cursor:pointer;margin:5px 5px 0 0}.alt{background:#e7eef7;color:#0b3b78}.danger{background:#a52c2c}
+.muted{color:#64748b;font-size:13px}.hidden{display:none!important}.row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.notice{background:#edf5ff;padding:10px;border-radius:8px;color:#16477d;margin:10px 0}canvas{width:100%;height:130px;border:1px dashed #9aaabd;border-radius:8px;touch-action:none}
+.os{border:1px solid #dce3ec;border-radius:9px;padding:12px;margin-top:10px}.tag{display:inline-block;border-radius:20px;padding:3px 8px;background:#e6f1ff;color:#16477d;font-size:11px;font-weight:700}.tag.andamento{background:#fff0d9;color:#854700}.tag.concluida{background:#e4f6eb;color:#146438}
+@media(max-width:650px){.s3,.s4,.s6{grid-column:span 12}main{margin:10px auto}.card{padding:14px}}
+@media print{header,.no-print,#login,#listCard{display:none!important}body{background:#fff}main{margin:0;padding:0}.card{border:0;box-shadow:none}}
+</style></head>
+<body>
+<header><div class="brand">ENGETEC</div><div>ASSISTÊNCIA TÉCNICA • EQUIPAMENTOS MÉDICOS</div></header>
+<main>
+<section id="login" class="card"><h2>Acesso ao sistema</h2><p class="muted">Entre com seu e-mail e senha. No primeiro acesso, crie sua conta.</p>
+<label>E-mail</label><input id="email" type="email" autocomplete="username">
+<label style="margin-top:10px">Senha</label><input id="password" type="password" autocomplete="current-password">
+<button id="signIn">Entrar</button><button id="signUp" class="alt">Criar conta</button><p id="loginMsg" class="notice">Configure as credenciais do Supabase no arquivo index.html antes de usar.</p></section>
+<div id="app" class="hidden">
+<section class="card no-print"><div class="row"><div><b>Ordens de Serviço</b><div class="muted" id="userLabel"></div></div><div><button id="newOS" class="alt">Nova OS</button><button id="signOut" class="alt">Sair</button></div></div><p id="msg" class="notice hidden"></p></section>
+<form id="osForm" class="card"><h2 id="formTitle">Nova Ordem de Serviço</h2>
+<div class="grid"><div class="f s3"><label>Número</label><input id="numero" readonly value="Gerado ao salvar"></div><div class="f s3"><label>Data *</label><input id="data" type="date" required></div><div class="f s3"><label>Hora</label><input id="hora" type="time"></div><div class="f s3"><label>Status</label><select id="status"><option>Aberta</option><option>Em andamento</option><option>Concluída</option></select></div></div>
+<h2 style="margin-top:22px">Cliente</h2><div class="grid"><div class="f s6"><label>Nome / Razão social *</label><input id="cliente" required></div><div class="f s3"><label>CPF / CNPJ</label><input id="documento"></div><div class="f s3"><label>Telefone / contato</label><input id="contato"></div><div class="f"><label>Endereço</label><input id="endereco"></div></div>
+<h2 style="margin-top:22px">Equipamento</h2><div class="grid"><div class="f s4"><label>Tipo *</label><select id="equipamento" required><option value="">Selecione</option><option>Autoclave</option><option>Termodesinfectora</option><option>Lavadora ultrassônica</option><option>Seladora</option><option>Monitor multiparamétrico</option><option>Outro</option></select></div><div class="f s4"><label>Marca</label><input id="marca"></div><div class="f s4"><label>Modelo</label><input id="modelo"></div><div class="f s6"><label>Nº de série</label><input id="serie"></div><div class="f s6"><label>Patrimônio</label><input id="patrimonio"></div></div>
+<h2 style="margin-top:22px">Atendimento técnico</h2><div class="grid"><div class="f"><label>Relato do cliente</label><textarea id="relato"></textarea></div><div class="f"><label>Diagnóstico / avaliação</label><textarea id="diagnostico"></textarea></div><div class="f"><label>Serviço executado</label><textarea id="servico"></textarea></div><div class="f s6"><label>Peças / materiais utilizados</label><textarea id="pecas"></textarea></div><div class="f s6"><label>Técnico responsável *</label><input id="tecnico" required></div></div>
+<h2 style="margin-top:22px">Assinaturas</h2><div class="grid"><div class="f s6"><label>Cliente / responsável</label><canvas id="sigClient"></canvas><button type="button" class="alt no-print" data-clear="sigClient">Limpar</button></div><div class="f s6"><label>Técnico</label><canvas id="sigTech"></canvas><button type="button" class="alt no-print" data-clear="sigTech">Limpar</button></div></div>
+<div class="no-print" style="margin-top:15px"><button type="submit" id="save">Salvar OS</button><button type="button" id="print" class="alt">Imprimir / Salvar PDF</button><button type="button" id="cancel" class="alt">Cancelar edição</button></div></form>
+<section id="listCard" class="card no-print"><div class="row"><h2 style="border:0;margin:0">Ordens cadastradas</h2><input id="search" style="max-width:260px" placeholder="Buscar OS ou cliente"></div><div id="list"><p class="muted">Aguardando conexão...</p></div></section>
+</div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* Cole aqui a Project URL e a chave publishable do Supabase. Nunca use sb_secret/service_role no navegador. */
+const SUPABASE_URL="COLE_AQUI_URL_DO_PROJETO",SUPABASE_KEY="COLE_AQUI_CHAVE_PUBLISHABLE";
+const configured=SUPABASE_URL.startsWith("https://")&&!SUPABASE_URL.includes("COLE_AQUI")&&!SUPABASE_KEY.includes("COLE_AQUI");
+let db=null,user=null,records=[],editing=null;const $=id=>document.getElementById(id);
+const fields=["data","hora","status","cliente","documento","contato","endereco","equipamento","marca","modelo","serie","patrimonio","relato","diagnostico","servico","pecas","tecnico"];
+function notice(id,t){$(id).textContent=t;$(id).classList.remove("hidden")}
+function today(){let d=new Date();$("data").value=new Date(d-d.getTimezoneOffset()*60000).toISOString().slice(0,10);$("hora").value=d.toTimeString().slice(0,5)}
+function signature(id){let c=$(id),x=c.getContext("2d"),down=false;function resize(){let old=c.toDataURL(),w=c.clientWidth;c.width=w*devicePixelRatio;c.height=130*devicePixelRatio;x.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);x.lineWidth=2;x.lineCap="round";x.strokeStyle="#172334";if(old.length>1500){let im=new Image();im.onload=()=>x.drawImage(im,0,0,w,130);im.src=old}}resize();window.addEventListener("resize",resize);let p=e=>{let r=c.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};c.onpointerdown=e=>{down=true;c.setPointerCapture(e.pointerId);let a=p(e);x.beginPath();x.moveTo(a.x,a.y)};c.onpointermove=e=>{if(down){let a=p(e);x.lineTo(a.x,a.y);x.stroke()}};["pointerup","pointercancel","lostpointercapture"].forEach(v=>c.addEventListener(v,()=>down=false));return{data:()=>c.toDataURL("image/png"),clear:()=>x.clearRect(0,0,c.width,c.height)}}
+const sigC=signature("sigClient"),sigT=signature("sigTech");document.querySelectorAll("[data-clear]").forEach(b=>b.onclick=()=> (b.dataset.clear==="sigClient"?sigC:sigT).clear());
+function reset(){editing=null;$("osForm").reset();$("numero").value="Gerado ao salvar";$("formTitle").textContent="Nova Ordem de Serviço";sigC.clear();sigT.clear();today()}
+function values(){let o={};fields.forEach(k=>o[k]=$(k).value);o.assinatura_cliente=sigC.data();o.assinatura_tecnico=sigT.data();return o}
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+async function auth(create){if(!configured){notice("loginMsg","Falta configurar a URL e a chave publishable do Supabase.");return}let email=$("email").value.trim(),password=$("password").value;if(!email||!password){notice("loginMsg","Informe e-mail e senha.");return}let r=create?await db.auth.signUp({email,password}):await db.auth.signInWithPassword({email,password});if(r.error){notice("loginMsg",r.error.message);return}if(create&&!r.data.session){notice("loginMsg","Conta criada. Confirme o e-mail para entrar.");return}await start()}
+async function start(){let {data}=await db.auth.getSession();user=data.session?.user;if(!user){$("login").classList.remove("hidden");$("app").classList.add("hidden");return}$("login").classList.add("hidden");$("app").classList.remove("hidden");$("userLabel").textContent=user.email;reset();await load()}
+async function load(){let r=await db.from("ordens_servico").select("*").order("created_at",{ascending:false});if(r.error){notice("msg","Erro ao carregar: "+r.error.message);return}records=r.data||[];render()}
+function render(){let q=$("search").value.toLowerCase(),a=records.filter(o=>[o.numero,o.cliente,o.serie].join(" ").toLowerCase().includes(q));$("list").innerHTML=a.length?a.map(o=>'<div class="os"><b>OS '+esc(o.numero)+'</b> · '+esc(o.cliente)+'<div class="muted">'+esc(o.equipamento)+' · '+esc(o.data||"")+'</div><span class="tag '+(o.status==="Concluída"?"concluida":o.status==="Em andamento"?"andamento":"")+'">'+esc(o.status)+'</span><div><button class="alt" data-edit="'+o.id+'">Editar</button><button class="danger" data-delete="'+o.id+'">Excluir</button></div></div>').join(""):'<p class="muted">Nenhuma OS encontrada.</p>';$("list").querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>edit(b.dataset.edit));$("list").querySelectorAll("[data-delete]").forEach(b=>b.onclick=()=>removeOS(b.dataset.delete))}
+function draw(id,data){if(!data)return;let c=$(id),im=new Image();im.onload=()=>c.getContext("2d").drawImage(im,0,0,c.clientWidth,130);im.src=data}
+function edit(id){let o=records.find(x=>String(x.id)===String(id));if(!o)return;editing=id;fields.forEach(k=>$(k).value=o[k]??"");$("numero").value=o.numero;$("formTitle").textContent="Editar OS "+o.numero;sigC.clear();sigT.clear();draw("sigClient",o.assinatura_cliente);draw("sigTech",o.assinatura_tecnico);$("osForm").scrollIntoView({behavior:"smooth"})}
+async function save(e){e.preventDefault();$("save").disabled=true;try{let o=values(),r;if(editing)r=await db.from("ordens_servico").update(o).eq("id",editing).select().single();else r=await db.from("ordens_servico").insert({...o,numero:"PENDENTE"}).select().single();if(r.error)throw r.error;if(!editing){let u=await db.from("ordens_servico").update({numero:"OS-"+String(r.data.id).padStart(6,"0")}).eq("id",r.data.id);if(u.error)throw u.error}notice("msg","Ordem salva na nuvem.");reset();await load()}catch(e){notice("msg","Falha ao salvar: "+e.message)}finally{$("save").disabled=false}}
+async function removeOS(id){if(!confirm("Excluir esta ordem de serviço?"))return;let r=await db.from("ordens_servico").delete().eq("id",id);if(r.error)notice("msg",r.error.message);else{notice("msg","OS excluída.");await load()}}
+$("signIn").onclick=()=>auth(false);$("signUp").onclick=()=>auth(true);$("signOut").onclick=async()=>{await db.auth.signOut();await start()};$("osForm").onsubmit=save;$("newOS").onclick=reset;$("cancel").onclick=reset;$("print").onclick=()=>window.print();$("search").oninput=render;
+if(configured){db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);start()}else notice("loginMsg","Aplicação criada. Configure as credenciais do Supabase para ativar login e armazenamento em nuvem.");
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+</script></body></html>
