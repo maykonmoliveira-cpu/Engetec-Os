@@ -254,6 +254,16 @@ $("showBudgetBtn").onclick=()=>showModule("budget");$("showOSBtn").onclick=()=>s
   finally{login.disabled=signup.disabled=false}
  }
  document.addEventListener("click",function(event){
+  const toggle=event.target.closest("#togglePassword");
+  if(toggle){
+   event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
+   const input=document.getElementById("password");
+   const visible=input.type==="password";
+   input.type=visible?"text":"password";
+   toggle.textContent=visible?"Ocultar":"Mostrar";
+   toggle.setAttribute("aria-pressed",String(visible));
+   return;
+  }
   const button=event.target.closest("#loginBtn,#signupBtn");
   if(!button)return;
   event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
