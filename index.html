@@ -186,7 +186,7 @@ async function sharePDF(){
  try{
   if(typeof html2pdf!=="function") throw new Error("Não foi possível carregar o gerador de PDF. Use Imprimir / Salvar como PDF.");
   const blob=await html2pdf().set({margin:[8,8,12,8],filename:${JSON.stringify(title)}+".pdf",image:{type:"jpeg",quality:0.98},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"}}).from(document.querySelector(".sheet")).outputPdf("blob");
-  const filename=(String(title)).replace(/[^a-z0-9_-]+/gi,"_")+".pdf";
+  const filename=${JSON.stringify(title)}.replace(/[^a-z0-9_-]+/gi,"_")+".pdf";
   const file=new File([blob],filename,{type:"application/pdf"});
   if(navigator.canShare&&navigator.canShare({files:[file]})){
    await navigator.share({files:[file],title:filename});
