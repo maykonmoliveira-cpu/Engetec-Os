@@ -70,7 +70,7 @@ function signature(c){return c.dataset.hasInk==="1"?c.toDataURL("image/png"):nul
 function restoreSig(c,data){clearSig(c.id);if(!data||!data.startsWith("data:image"))return;const im=new Image();im.onload=()=>{const ctx=c.getContext("2d"),ratio=window.devicePixelRatio||1;ctx.setTransform(ratio,0,0,ratio,0,0);ctx.drawImage(im,0,0,c.clientWidth,130);c.dataset.hasInk="1"};im.src=data}
 function reset(){editing=null;$("form").reset();$("num").value="Gerado automaticamente ao salvar";$("heading").textContent="Nova Ordem de Serviço";clearSig("sigC");clearSig("sigT");dateNow();hideMessage("msg")}
 function detail(){const o={};fields.forEach(k=>o[k]=$(k).value);o.assinatura_cliente=signature(c1);o.assinatura_tecnico=signature(c2);return o}
-function makeOSNumber(){return Date.now()*1000+Math.floor(Math.random()*1000)}
+function makeOSNumber(){return Math.floor(100000+Math.random()*900000)}
 function formatOSNumber(n){return "ENGETEC-"+String(n||"")}
 function dbPayload(d, numeroOS){
  const openedAt=d.data?(d.data+"T"+(d.hora||"00:00")+":00"):new Date().toISOString();
