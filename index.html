@@ -228,37 +228,7 @@ async function checklistHistory(){
 }
 async function useTemplate(id){const r=await db.from("checklist_modelos").select("*").eq("id",id).single();if(r.error){alert("Erro ao abrir checklist: "+r.error.message);return}const t=r.data,items=Array.isArray(t.itens)?t.itens:[];$("runChecklist").innerHTML='<h2>Executar: '+esc(t.nome)+'</h2><div class="grid"><div class="f s6"><label>Cliente</label><input id="runCliente"></div><div class="f s6"><label>Técnico</label><input id="runTecnico"></div><div class="f s6"><label>Marca</label><input id="runMarca"></div><div class="f s6"><label>Modelo</label><input id="runModelo"></div><div class="f s6"><label>Número de série</label><input id="runSerie"></div><div class="f"><label>Observações gerais</label><textarea id="runObs"></textarea></div></div>'+items.map((it,i)=>'<div class="item"><b>'+esc(it.texto||it)+'</b><select id="resp'+i+'"><option>OK</option><option>Não OK</option><option>Não aplicável</option></select><input id="obs'+i+'" placeholder="Medição / observação"></div>').join("")+'<button type="button" id="saveRun">Salvar execução</button>';$("saveRun").onclick=async()=>{const respostas=items.map((it,i)=>({item:it.texto||it,status:$("resp"+i).value,observacao:$("obs"+i).value}));const x=await db.from("checklist_execucoes").insert({user_id:user.id,modelo_id:t.id,cliente:$("runCliente").value||null,equipamento:t.equipamento,marca:$("runMarca").value||null,modelo:$("runModelo").value||null,numero_serie:$("runSerie").value||null,tecnico:$("runTecnico").value||null,data_execucao:localDate(),respostas,observacoes:$("runObs").value||null});if(x.error)alert("Erro ao salvar execução: "+x.error.message);else alert("Checklist salvo no histórico.")}}
 $("templateList").addEventListener("click",e=>{const b=e.target.closest("[data-template]");if(b)useTemplate(b.dataset.template)});$("list").addEventListener("click",e=>{const a=e.target.closest("[data-edit]"),b=e.target.closest("[data-delete]"),c=e.target.closest("[data-os-pdf]");if(a)editOS(a.dataset.edit);if(b)deleteOS(b.dataset.delete);if(c)printSavedOS(c.dataset.osPdf)});document.querySelectorAll("[data-clear]").forEach(b=>b.addEventListener("click",()=>clearSig(b.dataset.clear)));
-$("togglePassword").onclick=()=>{const input=$("password"),visible=input.type==="password";input.type=visible?"text":"password";$("togglePassword").textContent=visible?"Ocultar":"Mostrar";$("togglePassword").setAttribute("aria-pressed",String(visible))};$("loginBtn").onclick=()=>enter(false);$("signupBtn").onclick=()=>enter(true);$("logoutBtn").onclick=async()=>{await db.auth.signOut();await start()};$("newBtn").onclick=reset;$("printBtn").onclick=()=>printOS();$("search").oninput=render;$("loadTemplate").onclick=templates;$("refreshChecklistHistory").onclick=checklistHistory;
+$("togglePassword").addEventListener("click",e=>{e.preventDefault();const input=$("password"),visible=input.type==="password";input.type=visible?"text":"password";$("togglePassword").textContent=visible?"Ocultar":"Mostrar";$("togglePassword").setAttribute("aria-pressed",String(visible))});$("loginBtn").addEventListener("click",e=>{e.preventDefault();enter(false)});$("signupBtn").addEventListener("click",e=>{e.preventDefault();enter(true)});$("logoutBtn").onclick=async()=>{await db.auth.signOut();await start()};$("newBtn").onclick=reset;$("printBtn").onclick=()=>printOS();$("search").oninput=render;$("loadTemplate").onclick=templates;$("refreshChecklistHistory").onclick=checklistHistory;
 $("showBudgetBtn").onclick=()=>showModule("budget");$("showOSBtn").onclick=()=>showModule("os");$("budgetForm").addEventListener("submit",saveBudget);$("addBudgetItem").onclick=()=>addBudgetItem();$("budgetDiscount").addEventListener("input",updateBudgetTotals);$("newBudgetBtn").onclick=newBudget;$("budgetPdfBtn").onclick=()=>budgetPrint({...budgetPayload(),...budgetMath()});$("budgetSearch").oninput=renderBudgets;$("budgetList").addEventListener("click",e=>{const a=e.target.closest("[data-budget-edit]"),b=e.target.closest("[data-budget-pdf]");if(a)editBudget(a.dataset.budgetEdit);if(b){const x=budgetRows.find(v=>String(v.id)===String(b.dataset.budgetPdf));if(x)budgetPrint(x)}});$("printBtn").onclick=printOS;start();
 </script>
-<script>
-/* Fallback independente para os botões de acesso */
-(function(){
- window.togglePasswordVisibility=function(){const input=document.getElementById("password"),button=document.getElementById("togglePassword");if(!input||!button)return;const visible=input.type==="password";input.type=visible?"text":"password";button.textContent=visible?"Ocultar":"Mostrar";button.setAttribute("aria-pressed",String(visible));};
- const msg=document.getElementById("loginMsg");
- function show(text){if(msg){msg.textContent=text;msg.classList.remove("hidden")}}
- async function access(create){
-  const email=document.getElementById("email").value.trim();
-  const password=document.getElementById("password").value;
-  if(!email||!password){show("Informe e-mail e senha.");return}
-  const login=document.getElementById("loginBtn"),signup=document.getElementById("signupBtn");
-  login.disabled=signup.disabled=true;show("Conectando ao sistema...");
-  try{
-   if(!window.supabase||!window.supabase.createClient)throw new Error("A biblioteca de acesso não carregou. Verifique a internet e atualize a página.");
-   const client=window.supabase.createClient("https://sgyyfigxqeoobbtszqdv.supabase.co","sb_publishable_TlAC5LaFcS_3-WpAgUQeWQ_vOyautpO");
-   const result=create?await client.auth.signUp({email,password}):await client.auth.signInWithPassword({email,password});
-   if(result.error)throw result.error;
-   if(create&&!result.data.session){show("Conta criada. Confirme o e-mail recebido e depois faça login.");return}
-   show("Acesso confirmado. Abrindo o aplicativo...");
-   window.location.reload();
-  }catch(error){show("Falha no acesso: "+(error&&error.message?error.message:"Não foi possível conectar."))}
-  finally{login.disabled=signup.disabled=false}
- }
- document.addEventListener("click",function(event){
-  const button=event.target.closest("#loginBtn,#signupBtn");
-  if(!button)return;
-  event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
-  access(button.id==="signupBtn");
- },true);
-})();
-</script></body></html>
+</body></html>
