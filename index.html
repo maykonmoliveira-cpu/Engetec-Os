@@ -16,13 +16,15 @@ h2{font-size:17px;color:#0b3b78;border-bottom:1px solid #ddd;padding-bottom:8px}
 .f{grid-column:span 12}.s3{grid-column:span 3}.s4{grid-column:span 4}.s6{grid-column:span 6}
 label{display:block;font-size:13px;font-weight:650;margin:5px 0}
 input,select,textarea{width:100%;padding:10px;border:1px solid #bbc7d5;border-radius:7px;font:inherit}
+.password-wrap{display:flex;gap:8px;align-items:stretch}
+.password-wrap input{flex:1;min-width:0}
+.password-wrap button{margin:0;white-space:nowrap}
 textarea{min-height:70px}
 button{padding:10px 14px;margin:5px 4px 0 0;border:0;border-radius:7px;background:#0b3b78;color:white;font-weight:650}
 button:disabled{opacity:.55}.alt{background:#e7eef7;color:#0b3b78}.danger{background:#a52c2c}
 .hidden{display:none!important}
-#signupBtn{background:#0b3b78;color:white}
-#signupBtn.selected{background:#062653;color:white;box-shadow:0 0 0 3px #93c5fd}
-#loginBtn.selected{background:#062653;color:white;box-shadow:0 0 0 3px #93c5fd}
+#loginBtn,#signupBtn{background:#e7eef7;color:#0b3b78}
+#loginBtn.selected,#signupBtn.selected{background:#0b3b78;color:white;box-shadow:0 0 0 3px #93c5fd}
 .notice{padding:10px;background:#edf5ff;border-radius:7px;white-space:pre-wrap}
 .muted{color:#64748b;font-size:13px}.os{padding:12px;border:1px solid #ddd;border-radius:8px;margin-top:8px}
 canvas{display:block;width:100%;height:130px;border:1px dashed #999;touch-action:none;border-radius:7px;background:#fff}
@@ -38,7 +40,11 @@ canvas{display:block;width:100%;height:130px;border:1px dashed #999;touch-action
 <section id="login" class="card">
 <h2>Acesso</h2>
 <label>E-mail</label><input id="email" type="email" autocomplete="username">
-<label>Senha</label><input id="password" type="password" autocomplete="current-password">
+<label>Senha</label>
+<div class="password-wrap">
+<input id="password" type="password" autocomplete="current-password">
+<button type="button" id="togglePassword" class="alt" aria-label="Mostrar senha" aria-pressed="false">Mostrar</button>
+</div>
 <button type="button" id="loginBtn">Entrar</button>
 <button type="button" id="signupBtn" class="alt">Criar conta</button>
 <p id="loginMsg" class="notice"></p>
@@ -277,6 +283,13 @@ window.useTemplate=async id=>{
   const x=await db.from("checklist_execucoes").insert({modelo_id:t.id,cliente:$("runCliente").value||null,equipamento:t.equipamento,marca:$("runMarca").value||null,modelo:$("runModelo").value||null,numero_serie:$("runSerie").value||null,tecnico:$("runTecnico").value||null,data_execucao:localDate(),respostas,observacoes:$("runObs").value||null});
   if(x.error)alert("Erro ao salvar execução: "+x.error.message);else alert("Checklist salvo no histórico.");
  };
+};
+$("togglePassword").onclick=()=>{
+ const input=$("password"),visible=input.type==="password";
+ input.type=visible?"text":"password";
+ $("togglePassword").textContent=visible?"Ocultar":"Mostrar";
+ $("togglePassword").setAttribute("aria-label",visible?"Ocultar senha":"Mostrar senha");
+ $("togglePassword").setAttribute("aria-pressed",String(visible));
 };
 $("loginBtn").onclick=()=>{
  $("loginBtn").classList.add("selected");
