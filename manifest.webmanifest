@@ -1,0 +1,17 @@
+{
+  "name": "ENGETEC | OS e Orçamentos",
+  "short_name": "ENGETEC",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0b3b78",
+  "icons": [
+    {
+      "src": "assets/engetec-app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
