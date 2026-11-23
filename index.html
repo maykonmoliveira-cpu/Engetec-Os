@@ -19,7 +19,11 @@ input,select,textarea{width:100%;padding:10px;border:1px solid #bbc7d5;border-ra
 textarea{min-height:70px}
 button{padding:10px 14px;margin:5px 4px 0 0;border:0;border-radius:7px;background:#0b3b78;color:white;font-weight:650}
 button:disabled{opacity:.55}.alt{background:#e7eef7;color:#0b3b78}.danger{background:#a52c2c}
-.hidden{display:none!important}.notice{padding:10px;background:#edf5ff;border-radius:7px;white-space:pre-wrap}
+.hidden{display:none!important}
+#signupBtn{background:#0b3b78;color:white}
+#signupBtn.selected{background:#062653;color:white;box-shadow:0 0 0 3px #93c5fd}
+#loginBtn.selected{background:#062653;color:white;box-shadow:0 0 0 3px #93c5fd}
+.notice{padding:10px;background:#edf5ff;border-radius:7px;white-space:pre-wrap}
 .muted{color:#64748b;font-size:13px}.os{padding:12px;border:1px solid #ddd;border-radius:8px;margin-top:8px}
 canvas{display:block;width:100%;height:130px;border:1px dashed #999;touch-action:none;border-radius:7px;background:#fff}
 .item{padding:10px;border:1px solid #ddd;border-radius:8px;margin:8px 0}
@@ -274,8 +278,16 @@ window.useTemplate=async id=>{
   if(x.error)alert("Erro ao salvar execução: "+x.error.message);else alert("Checklist salvo no histórico.");
  };
 };
-$("loginBtn").onclick=()=>enter(false);
-$("signupBtn").onclick=()=>enter(true);
+$("loginBtn").onclick=()=>{
+ $("loginBtn").classList.add("selected");
+ $("signupBtn").classList.remove("selected");
+ enter(false);
+};
+$("signupBtn").onclick=()=>{
+ $("signupBtn").classList.add("selected");
+ $("loginBtn").classList.remove("selected");
+ enter(true);
+};
 $("logoutBtn").onclick=async()=>{await db.auth.signOut();await start()};
 $("newBtn").onclick=reset;
 $("printBtn").onclick=()=>window.print();
