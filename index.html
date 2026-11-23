@@ -200,7 +200,8 @@ function buildOSHTML(d,number,status,closing,checkHTML){
  return html;
 }
 async function printOS(){
- if(!$('form').reportValidity())return;
+ // A pré-visualização/PDF não deve ser bloqueada pela validação do formulário.
+ // Os campos obrigatórios continuam sendo validados ao salvar a OS.
  const d=detail(),o=editing?rows.find(x=>String(x.id)===String(editing)):null;
  const number=o?formatOSNumber(o.numero_os):'PRÉVIA - OS não salva';
  printDocument(number,buildOSHTML(d,number,d.status,d.fechamento,""));
