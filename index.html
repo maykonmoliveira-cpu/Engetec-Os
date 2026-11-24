@@ -159,7 +159,7 @@ function printDocument(title,body){
  .field{border:1px solid var(--line);border-radius:5px;padding:6px 7px;min-height:31px;overflow-wrap:anywhere}
  .field b{display:block;color:var(--navy);font-size:9px;text-transform:uppercase;letter-spacing:.45px;margin-bottom:3px}
  .field span{font-size:12px;white-space:pre-wrap}
- .field.full{grid-column:1/-1;min-height:36px}
+ .field.full{grid-column:1/-1;min-height:36px}.field.time-start{grid-column:1}.field.time-end{grid-column:2}
  .check-table td:last-child{white-space:pre-wrap}
  .status-pill{display:inline-block;border:1px solid #b8d2e8;color:var(--blue);border-radius:20px;padding:4px 9px;font-size:10px;font-weight:700}
  .company-line{font-size:10px;color:var(--muted);margin-top:4px}
@@ -283,7 +283,7 @@ function budgetPrint(x){
 }
 function formatDateBR(value){const m=String(value||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?m[3]+"/"+m[2]+"/"+m[1]:(value||"—")}
 function osMeta(number,d,status){return '<div class="doc-title"><h1 class="os-title">ORDEM DE SERVIÇO TÉCNICA</h1><div class="doc-number">'+esc(number)+'</div></div><div class="meta-grid"><div class="meta"><small>Data de abertura</small><strong>'+esc(formatDateBR(d.data))+'</strong></div><div class="meta"><small>Status</small><strong>'+esc(status||"—")+'</strong></div><div class="meta"><small>Cliente</small><strong>'+esc(d.cliente||"—")+'</strong></div></div>'}
-function osFields(items){return '<div class="field-grid">'+items.map(([label,value,full])=>'<div class="field'+(full?' full':'')+'"><b>'+esc(label)+'</b><span>'+esc(value||"—")+'</span></div>').join('')+'</div>'}
+function osFields(items){return '<div class="field-grid">'+items.map(([label,value,full])=>{const extra=label==='Hora de início'?' time-start':label==='Hora de encerramento'?' time-end':'';return '<div class="field'+(full?' full':'')+extra+'"><b>'+esc(label)+'</b><span>'+esc(value||"—")+'</span></div>'}).join('')+'</div>'}
 function buildOSHTML(d,number,status,closing,checkHTML){
  let html=osMeta(number,d,status);
  html+='<h3>1. Identificação do cliente</h3>'+osFields([['Cliente / Razão social',d.cliente,true],['CPF / CNPJ',d.documento],['Contato',d.contato],['Endereço',d.endereco,true]]);
