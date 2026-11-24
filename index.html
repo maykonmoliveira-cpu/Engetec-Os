@@ -75,7 +75,7 @@ function restoreSig(c,data){clearSig(c.id);if(!data||!data.startsWith("data:imag
 function reset(){editing=null;$("form").reset();$("num").value="Gerado automaticamente ao salvar";$("heading").textContent="Nova Ordem de Serviço";clearSig("sigC");clearSig("sigT");dateNow();hideMessage("msg")}
 function detail(){const o={};fields.forEach(k=>o[k]=$(k).value);o.assinatura_cliente=signature(c1);o.assinatura_tecnico=signature(c2);return o}
 function makeOSNumber(){return Math.floor(100000+Math.random()*900000)}
-function formatOSNumber(n){const digits=String(n??"").replace(/\D/g,"");return "ENGETEC-"+(digits.length>6?digits.slice(-6):digits)}
+function formatOSNumber(n){const digits=String(n??"").replace(/\D/g,"");return "OS-"+(digits.length>6?digits.slice(-6):digits)}
 function dbPayload(d, numeroOS){
  const openedAt=d.data?(d.data+"T"+(d.hora||"00:00")+":00"):new Date().toISOString();
  const detail={data:d.data,hora:d.hora,cliente:d.cliente,documento:d.documento,contato:d.contato,endereco:d.endereco,equipamento:d.equipamento,marca:d.marca,modelo:d.modelo,serie:d.serie,patrimonio:d.patrimonio,relato:d.relato,diagnostico:d.diagnostico,servico:d.servico,pecas:d.pecas,tecnico:d.tecnico,assinatura_cliente:d.assinatura_cliente,assinatura_tecnico:d.assinatura_tecnico};
