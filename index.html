@@ -288,7 +288,7 @@ function buildOSHTML(d,number,status,closing,checkHTML){
  let html=osMeta(number,d,status);
  html+='<h3>1. Identificação do cliente</h3>'+osFields([['Cliente / Razão social',d.cliente,true],['CPF / CNPJ',d.documento],['Contato',d.contato],['Endereço',d.endereco,true]]);
  html+='<h3>2. Identificação do equipamento</h3>'+osFields([['Tipo de equipamento',d.equipamento],['Marca',d.marca],['Modelo',d.modelo],['Número de série',d.serie],['Patrimônio',d.patrimonio]]);
- html+='<h3>3. Atendimento técnico</h3>'+osFields([['Relato do cliente',d.relato,true],['Diagnóstico técnico',d.diagnostico,true],['Serviços executados',d.servico,true],['Peças e materiais',d.pecas,true],['Responsável pelo atendimento',d.tecnico],['Hora de início',d.hora],['Hora de encerramento',closing||d.fechamento],['Orçamento (R$)',d.orcamento===''?'—':money(d.orcamento)],['Condição do orçamento',d.orcamento_status],['Observações finais',d.observacoes,true]]);
+ html+='<h3>3. Atendimento técnico</h3>'+osFields([['Relato do cliente',d.relato,true],['Diagnóstico técnico',d.diagnostico,true],['Serviços executados',d.servico,true],['Peças e materiais',d.pecas,true],['Responsável pelo atendimento',d.tecnico,true],['Hora de início',d.hora],['Hora de encerramento',closing||d.fechamento],['Orçamento (R$)',d.orcamento===''?'—':money(d.orcamento)],['Condição do orçamento',d.orcamento_status],['Observações finais',d.observacoes,true]]);
  html+=(checkHTML||'')+'<h3>4. Finalização e assinaturas</h3><div class="sign">'+signatureMarkup(d.assinatura_cliente,'Assinatura do cliente')+signatureMarkup(d.assinatura_tecnico,'Assinatura do técnico responsável')+'</div>';
  return html;
 }
