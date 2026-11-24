@@ -8,7 +8,7 @@
 </style></head><body>
 <header>ENGETEC <small style="font-size:12px;font-weight:400">| ORDEM DE SERVIÇO TÉCNICA</small></header><main>
 <section id="login" class="card"><h2>Acesso</h2><label>E-mail</label><input id="email" type="email" autocomplete="username"><label>Senha</label><div class="password-wrap"><input id="password" type="password" autocomplete="current-password"><button type="button" id="togglePassword" class="alt" onclick="var p=document.getElementById('password');var v=p.type==='password';p.type=v?'text':'password';this.textContent=v?'Ocultar':'Mostrar';this.setAttribute('aria-pressed',String(v));">Mostrar</button></div><button type="button" id="loginBtn" onclick="enter(false)">Entrar</button><button type="button" id="signupBtn" class="alt" onclick="enter(true)">Criar conta</button><p id="loginMsg" class="notice hidden"></p></section>
-<div id="app" class="hidden"><section class="card no-print"><div class="module-nav"><button type="button" id="showOSBtn" class="alt">Ordens de Serviço</button><button type="button" id="showBudgetBtn" class="alt">Orçamentos</button><button type="button" id="newBtn" class="alt">+ Nova OS</button><button type="button" id="logoutBtn" class="alt" onclick="window.engetecLogout && window.engetecLogout(event)">Sair</button></div> <span id="who" class="muted"></span><p id="msg" class="notice hidden"></p></section>
+<div id="app" class="hidden"><section class="card no-print"><div class="module-nav"><button type="button" id="showOSBtn" class="alt">Ordens de Serviço</button><button type="button" id="showBudgetBtn" class="alt">Orçamentos</button><button type="button" id="newBtn" class="alt">+ Nova OS</button><button type="button" id="logoutBtn" class="alt">Sair</button></div> <span id="who" class="muted"></span><p id="msg" class="notice hidden"></p></section>
 <form id="form" class="card"><h2 id="heading">Nova Ordem de Serviço</h2><div class="grid">
 <div class="f s3"><label>Número da OS</label><input id="num" readonly value="Gerado automaticamente"></div><div class="f s3"><label>Data de abertura *</label><input id="data" type="date" required></div><div class="f s3"><label>Hora de início</label><input id="hora" type="time"></div><div class="f s3"><label>Hora de encerramento</label><input id="fechamento" type="time"></div><div class="f s3"><label>Status</label><select id="status"><option>Aberta</option><option>Em andamento</option><option>Concluída</option></select></div></div>
 <h2>Cliente</h2><div class="grid"><div class="f s6"><label>Nome / Razão social *</label><input id="cliente" required></div><div class="f s3"><label>CPF / CNPJ</label><input id="documento"></div><div class="f s3"><label>Contato</label><input id="contato"></div><div class="f"><label>Endereço</label><input id="endereco"></div></div>
@@ -57,26 +57,7 @@ const SUPABASE_URL="https://sgyyfigxqeoobbtszqdv.supabase.co";
 const SUPABASE_KEY="sb_publishable_TlAC5LaFcS_3-WpAgUQeWQ_vOyautpO";
 const $=id=>document.getElementById(id);
 let db=null,user=null,rows=[],editing=null,budgetRows=[],editingBudget=null,budgetItems=[];
-window.engetecLogout=async function(event){
- if(event){event.preventDefault();event.stopPropagation();}
- const btn=document.getElementById("logoutBtn");
- if(btn)btn.disabled=true;
- // Volta imediatamente à tela de acesso, sem depender da resposta da rede.
- document.getElementById("app").classList.add("hidden");
- document.getElementById("login").classList.remove("hidden");
- document.getElementById("password").value="";
- document.getElementById("email").value="";
- document.getElementById("loginMsg").classList.add("hidden");
- window.scrollTo(0,0);
- try{
-  if(db && db.auth) {
-   const result=await db.auth.signOut({scope:"local"});
-   if(result && result.error) console.warn("Supabase signOut:",result.error.message);
-  }
- }catch(error){console.warn("Falha ao encerrar sessão remota/local:",error);}
- user=null;
- if(btn)btn.disabled=false;
-};
+
 
 const fields=["data","hora","fechamento","status","cliente","documento","contato","endereco","equipamento","marca","modelo","serie","patrimonio","relato","diagnostico","servico","pecas","tecnico","orcamento","orcamento_status","observacoes"];
 function showMessage(id,text){$(id).textContent=text;$(id).classList.remove("hidden")}
@@ -337,26 +318,14 @@ async function checklistHistory(){
 }
 async function useTemplate(id){const r=await db.from("checklist_modelos").select("*").eq("id",id).single();if(r.error){alert("Erro ao abrir checklist: "+r.error.message);return}const t=r.data,items=Array.isArray(t.itens)?t.itens:[];$("runChecklist").innerHTML='<h2>Executar: '+esc(t.nome)+'</h2><div class="grid"><div class="f s6"><label>Cliente</label><input id="runCliente"></div><div class="f s6"><label>Técnico</label><input id="runTecnico"></div><div class="f s6"><label>Marca</label><input id="runMarca"></div><div class="f s6"><label>Modelo</label><input id="runModelo"></div><div class="f s6"><label>Número de série</label><input id="runSerie"></div><div class="f"><label>Observações gerais</label><textarea id="runObs"></textarea></div></div>'+items.map((it,i)=>'<div class="item"><b>'+esc(it.texto||it)+'</b><select id="resp'+i+'"><option>OK</option><option>Não OK</option><option>Não aplicável</option></select><input id="obs'+i+'" placeholder="Medição / observação"></div>').join("")+'<button type="button" id="saveRun">Salvar execução</button>';$("saveRun").onclick=async()=>{const respostas=items.map((it,i)=>({item:it.texto||it,status:$("resp"+i).value,observacao:$("obs"+i).value}));const x=await db.from("checklist_execucoes").insert({user_id:user.id,modelo_id:t.id,cliente:$("runCliente").value||null,equipamento:t.equipamento,marca:$("runMarca").value||null,modelo:$("runModelo").value||null,numero_serie:$("runSerie").value||null,tecnico:$("runTecnico").value||null,data_execucao:localDate(),respostas,observacoes:$("runObs").value||null});if(x.error)alert("Erro ao salvar execução: "+x.error.message);else alert("Checklist salvo no histórico.")}}
 $("templateList").addEventListener("click",e=>{const b=e.target.closest("[data-template]");if(b)useTemplate(b.dataset.template)});$("list").addEventListener("click",e=>{const a=e.target.closest("[data-edit]"),b=e.target.closest("[data-delete]"),c=e.target.closest("[data-os-pdf]");if(a)editOS(a.dataset.edit);if(b)deleteOS(b.dataset.delete);if(c)printSavedOS(c.dataset.osPdf)});document.querySelectorAll("[data-clear]").forEach(b=>b.addEventListener("click",()=>clearSig(b.dataset.clear)));
-// O botão Mostrar senha usa somente o onclick inline para evitar alternância dupla.$("logoutBtn").onclick=async(e)=>{
- e?.preventDefault?.();
- const btn=$("logoutBtn");
- btn.disabled=true;
- try{
-  if(db){
-   const result=await db.auth.signOut({scope:"local"});
-   if(result.error)throw result.error;
-  }
-  user=null;
-  $("password").value="";
-  $("app").classList.add("hidden");
-  $("login").classList.remove("hidden");
-  hideMessage("loginMsg");
-  window.scrollTo({top:0,behavior:"instant"});
- }catch(err){
-  showMessage("msg","Não foi possível sair: "+(err.message||"Tente novamente."));
- }finally{
-  btn.disabled=false;
- }
+// O botão Mostrar senha usa somente o onclick inline para evitar alternância dupla.$("logoutBtn").onclick=()=>{
+ user=null;
+ $("password").value="";
+ $("app").classList.add("hidden");
+ $("login").classList.remove("hidden");
+ hideMessage("loginMsg");
+ window.scrollTo(0,0);
+ if(db?.auth) db.auth.signOut({scope:"local"}).catch(err=>console.warn("Supabase signOut:",err));
 };$("newBtn").onclick=reset;$("printBtn").onclick=()=>printOS();$("search").oninput=render;$("loadTemplate").onclick=templates;$("refreshChecklistHistory").onclick=checklistHistory;
 $("showBudgetBtn").onclick=()=>showModule("budget");$("showOSBtn").onclick=()=>showModule("os");$("budgetForm").addEventListener("submit",saveBudget);$("addBudgetItem").onclick=()=>addBudgetItem();$("budgetDiscount").addEventListener("input",updateBudgetTotals);$("newBudgetBtn").onclick=newBudget;$("budgetPdfBtn").onclick=()=>budgetPrint({...budgetPayload(),...budgetMath()});$("budgetSearch").oninput=renderBudgets;$("budgetList").addEventListener("click",e=>{const a=e.target.closest("[data-budget-edit]"),b=e.target.closest("[data-budget-pdf]");if(a)editBudget(a.dataset.budgetEdit);if(b){const x=budgetRows.find(v=>String(v.id)===String(b.dataset.budgetPdf));if(x)budgetPrint(x)}});$("printBtn").onclick=printOS;start();
 </script>
